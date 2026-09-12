@@ -1,0 +1,12 @@
+# Perfil de desarrollo local: cookie sin Secure (http://localhost), seed de datos demo y SQL visible.
+app:
+  security:
+    jwt-secret: ${JWT_SECRET:dev-only-secret-change-me-please-0123456789abcdef}
+    cookie-secure: false
+  seed:
+    enabled: true
+    password: ${DEV_SEED_PASSWORD:Demo1234!}
+
+logging:
+  level:
+    com.reviewtap: DEBUG

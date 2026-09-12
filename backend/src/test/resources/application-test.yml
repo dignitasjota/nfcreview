@@ -1,0 +1,15 @@
+app:
+  public-base-url: https://r.test.local
+  security:
+    jwt-secret: test-secret-test-secret-test-secret-test-secret
+    cookie-secure: false
+    login-max-attempts: 3
+  interactions:
+    async: false
+    dedupe-window: PT60S
+    client-rate-limit: 5
+  seed:
+    enabled: false
+logging:
+  level:
+    com.reviewtap: WARN
