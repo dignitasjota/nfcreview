@@ -86,13 +86,16 @@ ya aplicada.
 ## Tests
 
 ```bash
-cd backend && mvn test          # 58 tests: unitarios + integración con PostgreSQL (Testcontainers, requiere Docker)
+cd backend && mvn test          # 66 tests: unitarios + integración con PostgreSQL (Testcontainers, requiere Docker)
 cd frontend && npm test         # Vitest: utilidades de periodo, interceptor de errores, store de sesión
 ```
 
-Cubren: redirect válido/inexistente/inactivo/sin URL, deduplicación y techo por cliente, login/lockout/
-cookie/logout, autorización entre negocios (403), métricas y comparación de periodos, validación de URL,
-generación y decodificación de QR.
+Cubren: redirect válido/inexistente/inactivo/sin URL, deduplicación, techos por IP y por dispositivo,
+bots/HEAD ignorados, cabeceras falsificadas, login/lockout por cuenta+IP, revocación de sesiones
+(logout, cambio de contraseña), autorización entre negocios (403), métricas y comparación de periodos,
+validación de URL, generación y decodificación de QR.
+
+CI: `.github/workflows/ci.yml` ejecuta ambos bloques y construye las tres imágenes Docker en cada push.
 
 ## Crear el primer ADMIN
 

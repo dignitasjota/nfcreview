@@ -13,6 +13,8 @@ public interface BusinessRepository extends JpaRepository<Business, UUID> {
 
     boolean existsBySlug(String slug);
 
+    long countByActiveTrue();
+
     @Query("select b from Business b order by b.name asc")
     List<Business> findAllOrdered();
 

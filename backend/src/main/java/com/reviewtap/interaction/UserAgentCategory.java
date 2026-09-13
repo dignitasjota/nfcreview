@@ -16,7 +16,10 @@ public enum UserAgentCategory {
         }
         String ua = userAgent.toLowerCase(Locale.ROOT);
         if (ua.contains("bot") || ua.contains("crawler") || ua.contains("spider") || ua.contains("preview")
-                || ua.contains("curl") || ua.contains("wget") || ua.contains("python-requests")) {
+                || ua.contains("curl") || ua.contains("wget") || ua.contains("python-requests")
+                || ua.contains("whatsapp") || ua.contains("telegram") || ua.contains("facebookexternalhit")
+                || ua.contains("slack") || ua.contains("discord") || ua.contains("headless")
+                || ua.contains("uptimerobot") || ua.contains("monitor")) {
             return BOT;
         }
         if (ua.contains("ipad") || (ua.contains("android") && !ua.contains("mobile")) || ua.contains("tablet")) {

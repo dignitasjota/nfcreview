@@ -1,0 +1,16 @@
+/* Tipografías autoalojadas (sin peticiones a Google Fonts). Licencia OFL. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('fonts/bricolage-grotesque.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/figtree.woff2') format('woff2');
+}

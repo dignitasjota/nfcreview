@@ -141,15 +141,11 @@ public class AnalyticsService {
         List<TopBusiness> top = analytics.topBusinesses(period.from(), period.to(), 5).stream()
                 .map(b -> new TopBusiness(b.getBusinessId(), b.getName(), b.getTotal()))
                 .toList();
-        List<Business> all = businesses.findAll();
-        long activeBusinesses = all.stream().filter(Business::isActive).count();
-        var allDevices = devices.findAll();
-        long activeDevices = allDevices.stream().filter(d -> d.isActive()).count();
         List<TimelinePoint> timeline = fillDays(period,
                 analytics.globalTimeline(period.from(), period.to(), zone.getId()));
         return new AdminSummaryResponse(info(period), info(previous), current, prev,
-                changePercent(current.total(), prev.total()), all.size(), activeBusinesses, allDevices.size(),
-                activeDevices, top, timeline);
+                changePercent(current.total(), prev.total()), businesses.count(), businesses.countByActiveTrue(),
+                devices.count(), devices.countByActiveTrue(), top, timeline);
     }
 
     // ---- helpers ----

@@ -19,7 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Autentica cada petición a /api a partir de la cookie JWT. Recarga el usuario de BD para que
- * un usuario deshabilitado o con rol cambiado pierda acceso de inmediato (no al expirar el token).
+ * un usuario deshabilitado, con rol cambiado o con sesiones revocadas (token_version distinta)
+ * pierda acceso de inmediato, no al expirar el token.
  */
 @Component
 @RequiredArgsConstructor
@@ -52,6 +53,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     private Optional<AuthPrincipal> loadActiveUser(AuthPrincipal fromToken) {
         return userRepository.findById(fromToken.userId())
                 .filter(User::isEnabled)
-                .map(u -> new AuthPrincipal(u.getId(), u.getEmail(), u.getRole()));
+                .filter(u -> u.getTokenVersion() == fromToken.tokenVersion())
+                .map(u -> new AuthPrincipal(u.getId(), u.getEmail(), u.getRole(), u.getTokenVersion()));
     }
 }

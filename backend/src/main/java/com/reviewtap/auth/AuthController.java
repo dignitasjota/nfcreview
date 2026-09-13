@@ -3,7 +3,9 @@ package com.reviewtap.auth;
 import com.reviewtap.auth.AuthDtos.ChangePasswordRequest;
 import com.reviewtap.auth.AuthDtos.LoginRequest;
 import com.reviewtap.auth.AuthDtos.MeResponse;
+import com.reviewtap.interaction.ClientKeyResolver;
 import com.reviewtap.user.User;
+import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,8 @@ public class AuthController {
     private final SessionCookies cookies;
 
     @PostMapping("/login")
-    public ResponseEntity<MeResponse> login(@Valid @RequestBody LoginRequest request) {
-        User user = authService.authenticate(request.email(), request.password());
+    public ResponseEntity<MeResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
+        User user = authService.authenticate(request.email(), request.password(), ClientKeyResolver.clientIp(http));
         String token = jwtService.issue(user);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookies.create(token, jwtService.ttlSeconds()).toString())
@@ -36,6 +38,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
+        CurrentUser.find().ifPresent(p -> authService.logout(p.userId()));
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, cookies.clear().toString())
                 .build();

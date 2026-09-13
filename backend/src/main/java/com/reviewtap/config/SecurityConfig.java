@@ -2,6 +2,7 @@ package com.reviewtap.config;
 
 import com.reviewtap.auth.JwtCookieAuthFilter;
 import com.reviewtap.common.ApiError;
+import com.reviewtap.interaction.RedirectErrorPage;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,10 @@ public class SecurityConfig {
                                 writeError(res, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED",
                                         "Necesitas iniciar sesión");
                             } else {
-                                writeError(res, HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND", "Recurso no encontrado");
+                                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                                res.setContentType(MediaType.TEXT_HTML_VALUE);
+                                res.setCharacterEncoding("UTF-8");
+                                res.getWriter().write(RedirectErrorPage.HTML);
                             }
                         })
                         .accessDeniedHandler((req, res, e) -> writeError(res, HttpServletResponse.SC_FORBIDDEN,

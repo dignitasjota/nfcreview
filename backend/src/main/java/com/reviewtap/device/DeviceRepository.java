@@ -38,4 +38,6 @@ public interface DeviceRepository extends JpaRepository<Device, UUID> {
     List<BusinessDeviceCount> countGroupedByBusiness();
 
     long countByBusinessId(UUID businessId);
+
+    long countByActiveTrue();
 }

@@ -75,6 +75,9 @@ public class UserService {
         }
         User user = users.findById(id).orElseThrow(() -> ApiException.notFound("Usuario"));
         user.setEnabled(enabled);
+        if (!enabled) {
+            user.revokeSessions();
+        }
         log.info("Usuario {} {}", id, enabled ? "habilitado" : "deshabilitado");
         return toResponse(user, refsOf(id));
     }
@@ -83,7 +86,8 @@ public class UserService {
     public void resetPassword(UUID id, String newPassword) {
         User user = users.findById(id).orElseThrow(() -> ApiException.notFound("Usuario"));
         user.setPasswordHash(passwordEncoder.encode(newPassword));
-        log.info("Contraseña restablecida por un administrador para el usuario {}", id);
+        user.revokeSessions();
+        log.info("Contraseña restablecida por un administrador para el usuario {}; sesiones revocadas", id);
     }
 
     private List<UserBusinessRef> refsOf(UUID userId) {

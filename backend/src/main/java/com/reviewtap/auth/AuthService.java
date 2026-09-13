@@ -36,8 +36,8 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public User authenticate(String email, String rawPassword) {
-        if (attempts.isBlocked(email)) {
+    public User authenticate(String email, String rawPassword, String clientIp) {
+        if (attempts.isBlocked(email, clientIp)) {
             log.warn("Login bloqueado temporalmente para {}", LoginAttemptService.mask(email));
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "LOGIN_LOCKED",
                     "Demasiados intentos fallidos. Inténtalo de nuevo en unos minutos");
@@ -47,11 +47,11 @@ public class AuthService {
         String hash = user != null ? user.getPasswordHash() : dummyHash;
         boolean ok = passwordEncoder.matches(rawPassword, hash) && user != null && user.isEnabled();
         if (!ok) {
-            attempts.recordFailure(email);
+            attempts.recordFailure(email, clientIp);
             log.warn("Login fallido para {}", LoginAttemptService.mask(email));
             throw new BadCredentialsException("Credenciales inválidas");
         }
-        attempts.reset(email);
+        attempts.reset(email, clientIp);
         log.info("Login correcto: usuario {}", user.getId());
         return user;
     }
@@ -76,6 +76,13 @@ public class AuthService {
             throw ApiException.badRequest("INVALID_CURRENT_PASSWORD", "La contraseña actual no es correcta");
         }
         user.setPasswordHash(passwordEncoder.encode(newPassword));
-        log.info("Contraseña cambiada por el usuario {}", userId);
+        user.revokeSessions();
+        log.info("Contraseña cambiada por el usuario {}; sesiones anteriores revocadas", userId);
+    }
+
+    /** Cierra la sesión en TODOS los dispositivos: la cookie actual y cualquier otra emitida antes. */
+    @Transactional
+    public void logout(UUID userId) {
+        users.findById(userId).ifPresent(User::revokeSessions);
     }
 }

@@ -2,6 +2,7 @@ package com.reviewtap.interaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,6 +125,71 @@ class RedirectControllerIT extends AbstractIntegrationTest {
         mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", UA_IPHONE)).andExpect(status().isFound());
         mvc.perform(get("/d/{code}", second.getPublicCode()).header("User-Agent", UA_IPHONE)).andExpect(status().isFound());
         assertThat(interactions.count()).isEqualTo(2);
+    }
+
+    @Test
+    void forwardedForHeaderIsIgnoredOnlyRemoteAddrCounts() throws Exception {
+        // La IP se toma de getRemoteAddr() (saneada por Tomcat en producción); la cabecera que
+        // fabrique el cliente no cambia la clave de deduplicación.
+        for (int i = 0; i < 6; i++) {
+            mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", UA_IPHONE)
+                            .header("X-Forwarded-For", "10.0.0." + i)
+                            .with(req -> { req.setRemoteAddr("203.0.113.9"); return req; }))
+                    .andExpect(status().isFound());
+        }
+        // Otra IP real sí cuenta.
+        mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", UA_IPHONE)
+                        .with(req -> { req.setRemoteAddr("203.0.113.10"); return req; }))
+                .andExpect(status().isFound());
+        assertThat(interactions.count()).isEqualTo(2);
+    }
+
+    @Test
+    void botsLinkPreviewsAndHeadRequestsAreRedirectedButNotRecorded() throws Exception {
+        mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", "WhatsApp/2.23.20 A"))
+                .andExpect(status().isFound()).andExpect(header().string("Location", TARGET));
+        mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", "Googlebot/2.1"))
+                .andExpect(status().isFound());
+        mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", "facebookexternalhit/1.1"))
+                .andExpect(status().isFound());
+        mvc.perform(head("/d/{code}", device.getPublicCode()).header("User-Agent", UA_ANDROID))
+                .andExpect(status().isFound());
+        assertThat(interactions.count()).isZero();
+    }
+
+    @Test
+    void perDeviceCapLimitsRecordingRegardlessOfClient() throws Exception {
+        // app.interactions.device-rate-limit = 7 en el perfil test.
+        for (int i = 0; i < 12; i++) {
+            String ip = "198.51.100." + (i + 1);
+            mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", UA_IPHONE)
+                            .with(req -> { req.setRemoteAddr(ip); return req; }))
+                    .andExpect(status().isFound());
+        }
+        assertThat(interactions.count()).isEqualTo(7);
+    }
+
+    @Test
+    void rotatingUserAgentIsCappedPerIp() throws Exception {
+        // client-rate-limit = 5: aunque cada petición traiga un UA distinto, la IP es la misma.
+        for (int i = 0; i < 9; i++) {
+            mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", "ua-rotado-" + i)
+                            .with(req -> { req.setRemoteAddr("203.0.113.20"); return req; }))
+                    .andExpect(status().isFound());
+        }
+        assertThat(interactions.count()).isEqualTo(5);
+    }
+
+    @Test
+    void privateAddressesCollapseIntoOneBucket() throws Exception {
+        // Si Tomcat deja una IP privada como remoteAddr (cadena XFF fabricada), todas cuentan como el mismo cliente.
+        String[] privates = {"10.1.1.1", "10.1.1.2", "192.168.0.7", "172.16.5.5", "127.0.0.1", "100.64.3.3"};
+        for (String ip : privates) {
+            mvc.perform(get("/d/{code}", device.getPublicCode()).header("User-Agent", UA_IPHONE)
+                            .with(req -> { req.setRemoteAddr(ip); return req; }))
+                    .andExpect(status().isFound());
+        }
+        assertThat(interactions.count()).isEqualTo(1);
     }
 
     @Test

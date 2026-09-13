@@ -17,4 +17,8 @@ public interface BusinessUserRepository extends JpaRepository<BusinessUser, UUID
 
     @EntityGraph(attributePaths = "business")
     List<BusinessUser> findAllByUserId(UUID userId);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "business"})
+    List<BusinessUser> findAll();
 }

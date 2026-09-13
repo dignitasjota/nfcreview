@@ -67,27 +67,50 @@ inyectar valores arbitrarios ni afectar al total más allá de la deduplicación
 
 ## Deduplicación y protección básica anti-abuso
 
-`InteractionGuard` (memoria de proceso, Caffeine) aplica dos reglas antes de registrar:
+`InteractionGuard` (memoria de proceso, Caffeine) aplica tres reglas antes de registrar; en todos los
+casos el visitante **es redirigido igualmente**, sólo se omite el registro:
 
-1. **Deduplicación**: clave `deviceId + clientKey` en una caché con expiración de 60 s
-   (`app.interactions.dedupe-window`). Si ya existe, no se cuenta. Tres toques seguidos = 1 interacción.
-2. **Techo por cliente**: como máximo 40 interacciones (`client-rate-limit`) por `clientKey` en 10 minutos
-   sumando todos los dispositivos. Protege de un bucle de recargas contra distintos códigos.
+1. **Deduplicación**: clave `deviceId + HMAC(ip + user-agent)` con expiración de 60 s
+   (`app.interactions.dedupe-window`). Tres toques seguidos = 1 interacción. Dos móviles distintos
+   detrás de la misma IP (NAT del local) cuentan por separado.
+2. **Techo por IP**: como máximo 40 registros (`client-rate-limit`) por `HMAC(ip)` en 10 minutos
+   sumando todos los dispositivos. No incluye el User-Agent porque el cliente puede rotarlo.
+3. **Techo por dispositivo**: como máximo 60 registros por minuto (`device-rate-limit`) por
+   dispositivo, sea quien sea el cliente. Es la red de seguridad final: aunque alguien consiguiera
+   simular clientes distintos, la cifra queda acotada (un mostrador real no se acerca a ese ritmo).
 
-`clientKey` (`ClientKeyResolver`) = `HMAC-SHA256(salt, ip + "|" + user-agent)` truncado. El salt se genera
-con `SecureRandom` al arrancar y se rota cada día UTC, así que la clave no es reversible, no es estable
-entre días ni reinicios y **nunca se persiste**. La IP (`X-Forwarded-For` → `X-Real-IP` → `remoteAddr`)
-sólo existe en memoria durante el cálculo. En ambos casos el visitante **es redirigido igualmente**; sólo
-se omite el registro. Al ser estado en memoria, la protección es por instancia (suficiente para un
-despliegue single-node; con réplicas habría que moverla a Redis).
+Además, **no se registran** (pero sí se redirigen) las peticiones `HEAD` ni los User-Agents de bots y
+previsualizadores de enlaces (WhatsApp, Telegram, Facebook, Slack, Discord, Googlebot, monitores…),
+que no son personas delante del dispositivo.
 
-El mismo enfoque se usa para el bloqueo de login (`LoginAttemptService`: 8 fallos → 15 min por cuenta).
+### De dónde sale la IP
+
+`server.forward-headers-strategy=native`: el `RemoteIpValve` de Tomcat recorre `X-Forwarded-For`
+desde la derecha saltando proxies internos (rangos privados + `TRUSTED_PROXIES`) y deja en
+`getRemoteAddr()` el primer salto no confiable. Es la única fuente que usa la aplicación; **nunca se
+lee la cabecera directamente**: el cliente puede fabricar sus primeros valores (y el valve reescribe
+la cabecera dejando justamente esos). Si la cadena sólo contiene direcciones privadas —algo que en
+producción sólo ocurre con una cabecera fabricada— todas se agrupan en un único cubo `private`.
+Se descartó la estrategia `framework` (`ForwardedHeaderFilter`) porque toma el **primer** valor.
+
+Las claves son `HMAC-SHA256(salt, …)` truncados. El salt se genera con `SecureRandom` al arrancar y
+se rota cada día UTC: la clave no es reversible, no es estable entre días ni reinicios y **nunca se
+persiste**. La IP sólo existe en memoria durante el cálculo. Al ser estado en memoria, la protección
+es por instancia (suficiente para single-node; con réplicas habría que moverla a Redis).
+
+El bloqueo de login (`LoginAttemptService`) usa el mismo enfoque con dos claves: `email + IP`
+(8 fallos → 15 min; conocer el email de un cliente no permite dejarle sin acceso desde otra red) y
+`IP` (5×8 fallos → frena la enumeración de cuentas).
 
 ## Seguridad
 
 - **Sesión**: JWT HS256 (Nimbus, incluido en Spring Security) con `sub`, `email`, `role`, 8 h de vida, en
   una cookie `rt_session` **HttpOnly, SameSite=Strict, Secure** (configurable para `http://localhost`).
-  Angular nunca ve el token; el logout borra la cookie. No hay refresh tokens en el MVP.
+  Angular nunca ve el token. No hay refresh tokens en el MVP.
+  - **Revocación**: `app_user.token_version` viaja como claim `ver`. El filtro recarga el usuario en
+    cada petición y rechaza el token si la versión no coincide. Cerrar sesión, cambiar la
+    contraseña, que un ADMIN la restablezca o deshabilitar al usuario incrementan la versión:
+    todas las cookies anteriores (en cualquier dispositivo) dejan de valer al instante.
   - Elección frente a `Authorization: Bearer` + localStorage: elimina el robo de token por XSS y el
     manejo manual en el cliente. La API se sirve en el mismo origen que la SPA (nginx proxifica `/api`),
     por lo que no hay CORS ni cookies cross-site; si se separan dominios (`app.` / `api.`), ambos son

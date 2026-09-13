@@ -51,6 +51,7 @@ public class JwtService {
                 .expiresAt(now.plus(security.jwtTtl()))
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
+                .claim("ver", user.getTokenVersion())
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         return encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
@@ -61,7 +62,9 @@ public class JwtService {
             Jwt jwt = decoder.decode(token);
             UUID userId = UUID.fromString(jwt.getSubject());
             UserRole role = UserRole.valueOf(jwt.getClaimAsString("role"));
-            return Optional.of(new AuthPrincipal(userId, jwt.getClaimAsString("email"), role));
+            Long version = jwt.getClaim("ver");
+            return Optional.of(new AuthPrincipal(userId, jwt.getClaimAsString("email"), role,
+                    version == null ? -1 : version.intValue()));
         } catch (JwtException | IllegalArgumentException | NullPointerException e) {
             log.debug("JWT rechazado: {}", e.getMessage());
             return Optional.empty();

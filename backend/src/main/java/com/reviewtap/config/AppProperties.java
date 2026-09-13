@@ -28,7 +28,9 @@ public record AppProperties(
     public record Interactions(
             @DefaultValue("PT60S") Duration dedupeWindow,
             @DefaultValue("40") int clientRateLimit,
-            @DefaultValue("PT10M") Duration clientRateWindow) {}
+            @DefaultValue("PT10M") Duration clientRateWindow,
+            @DefaultValue("60") int deviceRateLimit,
+            @DefaultValue("PT1M") Duration deviceRateWindow) {}
 
     public record Bootstrap(String adminEmail, String adminPassword) {}
 

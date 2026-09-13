@@ -12,6 +12,7 @@ RUN npx ng build --configuration production
 FROM nginx:1.27-alpine
 COPY --from=build /build/dist/frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY security-headers.conf /etc/nginx/security-headers.conf
 ENV BACKEND_URL=http://backend:8080
 EXPOSE 80
 HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \

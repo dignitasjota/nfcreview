@@ -1,11 +1,11 @@
 package com.reviewtap.interaction;
 
 /** Página mínima cuando un enlace no está disponible. Mismo texto para todos los casos: no filtra causas. */
-final class RedirectErrorPage {
+public final class RedirectErrorPage {
 
     private RedirectErrorPage() {}
 
-    static final String HTML = """
+    public static final String HTML = """
             <!doctype html>
             <html lang="es">
             <head>

@@ -8,6 +8,7 @@ app:
     async: false
     dedupe-window: PT60S
     client-rate-limit: 5
+    device-rate-limit: 7
   seed:
     enabled: false
 logging:

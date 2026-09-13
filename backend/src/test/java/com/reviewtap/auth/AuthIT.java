@@ -113,6 +113,43 @@ class AuthIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void lockoutIsPerAccountAndIp() throws Exception {
+        user("lock@test.local", UserRole.BUSINESS_USER);
+        String bad = "{\"email\":\"lock@test.local\",\"password\":\"wrong1234\"}";
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(bad)
+                    .with(req -> { req.setRemoteAddr("198.51.100.7"); return req; })).andExpect(status().isUnauthorized());
+        }
+        // Desde otra IP el titular legítimo sigue pudiendo entrar.
+        mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"lock@test.local\",\"password\":\"" + PASSWORD + "\"}")
+                        .with(req -> { req.setRemoteAddr("198.51.100.8"); return req; }))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void logoutRevokesEveryPreviousSession() throws Exception {
+        user("pepe@test.local", UserRole.BUSINESS_USER);
+        Cookie first = login("pepe@test.local");
+        Cookie second = login("pepe@test.local");
+        mvc.perform(post("/api/auth/logout").cookie(second)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/auth/me").cookie(first)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/auth/me").cookie(second)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void changingPasswordRevokesOtherSessions() throws Exception {
+        user("pepe@test.local", UserRole.BUSINESS_USER);
+        Cookie old = login("pepe@test.local");
+        Cookie current = login("pepe@test.local");
+        mvc.perform(post("/api/auth/change-password").cookie(current).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"" + PASSWORD + "\",\"newPassword\":\"Nueva1234\"}"))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/auth/me").cookie(old)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/auth/me").cookie(current)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void changePasswordRequiresCurrentPassword() throws Exception {
         user("pepe@test.local", UserRole.BUSINESS_USER);
         Cookie session = login("pepe@test.local");

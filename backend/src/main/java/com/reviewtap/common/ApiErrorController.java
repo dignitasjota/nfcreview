@@ -3,7 +3,9 @@ package com.reviewtap.common;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.webmvc.error.ErrorController;
+import com.reviewtap.interaction.RedirectErrorPage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiErrorController implements ErrorController {
 
     @RequestMapping("/error")
-    public ResponseEntity<ApiError> error(HttpServletRequest request) {
+    public ResponseEntity<?> error(HttpServletRequest request) {
         Object statusAttr = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         int status = statusAttr instanceof Integer i ? i : 500;
         HttpStatus resolved = HttpStatus.resolve(status);
@@ -33,6 +35,12 @@ public class ApiErrorController implements ErrorController {
             default -> resolved.is5xxServerError() ? "INTERNAL_ERROR" : "ERROR";
         };
         String message = resolved.is5xxServerError() ? "Se ha producido un error inesperado" : resolved.getReasonPhrase();
+        Object uri = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+        boolean api = uri instanceof String u && u.startsWith("/api/");
+        if (!api) {
+            // Una persona que llega a una ruta pública inexistente ve la misma página que un enlace roto.
+            return ResponseEntity.status(resolved).contentType(MediaType.TEXT_HTML).body(RedirectErrorPage.HTML);
+        }
         return ResponseEntity.status(resolved).body(ApiError.of(code, message));
     }
 }

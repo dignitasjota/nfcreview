@@ -56,10 +56,12 @@ public class RedirectController {
             return unavailable(HttpStatus.NOT_FOUND);
         }
 
-        String clientKey = clientKeyResolver.resolve(request);
-        if (guard.shouldRecord(target.deviceId(), clientKey)) {
-            recorder.record(target.deviceId(), InteractionType.fromSource(src),
-                    UserAgentCategory.classify(request.getHeader("User-Agent")),
+        // Bots, previsualizaciones de enlaces (WhatsApp, iMessage…) y HEAD reciben el redirect
+        // pero no cuentan: no son personas delante del dispositivo.
+        UserAgentCategory category = UserAgentCategory.classify(request.getHeader("User-Agent"));
+        boolean human = category != UserAgentCategory.BOT && !"HEAD".equalsIgnoreCase(request.getMethod());
+        if (human && guard.shouldRecord(target.deviceId(), clientKeyResolver.resolve(request))) {
+            recorder.record(target.deviceId(), InteractionType.fromSource(src), category,
                     InteractionRecorder.refererOrigin(request.getHeader("Referer")));
         }
 

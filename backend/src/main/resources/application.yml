@@ -23,8 +23,14 @@ spring:
 
 server:
   port: 8080
-  # Detrás de Nginx / NPM: respeta X-Forwarded-Proto/Host para cookies Secure y URLs absolutas.
-  forward-headers-strategy: framework
+  # Detrás de Nginx / NPM. `native` = RemoteIpValve de Tomcat: recorre X-Forwarded-For desde la
+  # derecha saltando proxies internos (rangos privados), así que un valor falsificado por el cliente
+  # nunca se toma como su IP. (`framework` usa el PRIMER valor, que es spoofeable.)
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      # Proxies adicionales de confianza (regex) si el reverse proxy no está en una red privada.
+      trusted-proxies: ${TRUSTED_PROXIES:}
   error:
     include-stacktrace: never
     include-message: never

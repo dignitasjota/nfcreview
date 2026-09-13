@@ -44,6 +44,14 @@ public class User extends AuditedEntity {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    /** Se incrementa para invalidar todas las sesiones emitidas hasta ese momento. */
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+
+    public void revokeSessions() {
+        tokenVersion++;
+    }
+
     public String fullName() {
         return (firstName + " " + lastName).trim();
     }

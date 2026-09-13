@@ -24,17 +24,24 @@ public class ClientKeyResolver {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    /** Claves anónimas del visitante: {@code client} incluye el User-Agent; {@code ip} sólo la IP. */
+    public record ClientKeys(String client, String ip) {}
+
     private record Salt(LocalDate day, byte[] value) {}
 
     private final AtomicReference<Salt> salt = new AtomicReference<>(newSalt(LocalDate.now(ZoneOffset.UTC)));
 
-    public String resolve(HttpServletRequest request) {
+    public ClientKeys resolve(HttpServletRequest request) {
         String ip = clientIp(request);
         String ua = request.getHeader("User-Agent");
-        String material = ip + "|" + (ua == null ? "" : ua);
+        byte[] salt = currentSalt();
+        return new ClientKeys(hmac(salt, ip + "|" + (ua == null ? "" : ua)), hmac(salt, ip));
+    }
+
+    private static String hmac(byte[] salt, String material) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(currentSalt(), "HmacSHA256"));
+            mac.init(new SecretKeySpec(salt, "HmacSHA256"));
             byte[] digest = mac.doFinal(material.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(digest).substring(0, 22);
         } catch (Exception e) {
@@ -43,20 +50,49 @@ public class ClientKeyResolver {
     }
 
     /**
-     * Detrás de un reverse proxy la IP real llega en X-Forwarded-For (primer salto). Sólo se usa
-     * para la clave anónima; un valor falso únicamente afecta a la deduplicación de ese cliente.
+     * IP del cliente tal y como la resuelve Tomcat ({@code server.forward-headers-strategy=native}):
+     * el RemoteIpValve recorre X-Forwarded-For desde la derecha saltando los proxies internos
+     * (rangos privados y {@code TRUSTED_PROXIES}) y deja en {@code getRemoteAddr()} el primer salto
+     * no confiable. NO leemos la cabecera nosotros: el cliente puede fabricar sus primeros valores y,
+     * además, el valve reescribe la cabecera dejando precisamente esos saltos no confiables.
+     *
+     * <p>Si la cadena sólo contiene direcciones privadas, Tomcat deja la primera (fabricable). Un
+     * visitante real llega siempre desde una IP pública, así que cualquier IP privada/loopback se
+     * agrupa en un único cubo: no puede usarse para simular clientes distintos.
      */
-    static String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            int comma = forwarded.indexOf(',');
-            return (comma > 0 ? forwarded.substring(0, comma) : forwarded).trim();
+    public static String clientIp(HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        return isPrivate(ip) ? "private" : ip;
+    }
+
+    static boolean isPrivate(String ip) {
+        if (ip == null) {
+            return true;
         }
-        String real = request.getHeader("X-Real-IP");
-        if (real != null && !real.isBlank()) {
-            return real.trim();
+        try {
+            java.net.InetAddress addr = java.net.InetAddress.getByName(ip);
+            return addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress()
+                    || addr.isAnyLocalAddress() || isCgnatOr172(ip);
+        } catch (java.net.UnknownHostException e) {
+            return true;
         }
-        return request.getRemoteAddr();
+    }
+
+    /** 172.16/12 ya lo cubre isSiteLocalAddress; se añade 100.64/10 (CGNAT interno de algunos proxies). */
+    private static boolean isCgnatOr172(String ip) {
+        if (!ip.startsWith("100.")) {
+            return false;
+        }
+        String[] parts = ip.split("\\.");
+        if (parts.length != 4) {
+            return false;
+        }
+        try {
+            int second = Integer.parseInt(parts[1]);
+            return second >= 64 && second <= 127;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private byte[] currentSalt() {

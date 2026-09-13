@@ -55,7 +55,13 @@ Activa **Force SSL** y **HTTP/2** en ambos y solicita certificados Let's Encrypt
 NPM envía `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP` por defecto. **Importante**: el proxy debe
 reenviar la cabecera `Host` original (NPM lo hace; en nginx, `proxy_set_header Host $http_host`). Spring
 compara `Origin` con `Host`/`X-Forwarded-*` para distinguir peticiones same-origin de cross-origin: si el
-host llega alterado, el login devuelve 403 desde el navegador aunque funcione con `curl`. El backend tiene
+host llega alterado, el login devuelve 403 desde el navegador aunque funcione con `curl`.
+
+**IP del cliente y proxies de confianza.** El backend (`server.forward-headers-strategy=native`) toma la IP
+del cliente recorriendo `X-Forwarded-For` desde la derecha y saltando proxies en rangos privados
+(10/8, 172.16/12, 192.168/16, 127/8). Si tu reverse proxy está en **otro servidor con IP pública**,
+añádela en `TRUSTED_PROXIES` (regex, p. ej. `203\.0\.113\.10`); si no, esa IP se tomará como "cliente"
+y la deduplicación de interacciones agrupará a todos los visitantes. El backend tiene
 `server.forward-headers-strategy=framework`, con lo que Spring reconoce HTTPS (cookie `Secure`) y el host
 público; `ClientKeyResolver` usa `X-Forwarded-For` para la deduplicación anónima.
 
@@ -103,9 +109,14 @@ que redirige a Google y que la interacción aparece en el dashboard.
 
 ## Operación
 
-- **Logs**: `docker compose logs -f backend`. Se registran errores, logins fallidos (email enmascarado),
+- **Ver logs**: `docker compose logs -f backend`. Se registran errores, logins fallidos (email enmascarado),
   operaciones administrativas y redirecciones rechazadas. Las redirecciones correctas no se loguean.
-- **Backup**: `docker compose exec postgres pg_dump -U reviewtap reviewtap | gzip > backup-$(date +%F).sql.gz`.
+- **Backup automático**: `docker compose --profile backup up -d` arranca un side-car que hace `pg_dump`
+  comprimido cada 24 h en el volumen `backups` y borra los de más de `BACKUP_KEEP_DAYS` (14). Cópialos
+  fuera del servidor (rclone, restic, cron con `scp`…): un backup en la misma máquina no es un backup.
+  Manual: `docker compose exec postgres pg_dump -U reviewtap reviewtap | gzip > backup-$(date +%F).sql.gz`.
+  Restaurar: `gunzip -c backup.sql.gz | docker compose exec -T postgres psql -U reviewtap reviewtap`.
+- **Logs**: rotación configurada en compose (`json-file`, 5 × 20 MB por servicio).
 - **Actualizar**: `git pull && docker compose up -d --build`. Las migraciones nuevas se aplican solas.
 - **Salud**: `GET /actuator/health` (backend) y `GET /healthz` (frontend) para tu monitorización.
 - **Escalado**: una instancia del backend. Antes de replicar, mover deduplicación y bloqueo de login a Redis.
