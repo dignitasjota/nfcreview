@@ -48,6 +48,14 @@ export class AuthService {
     return me;
   }
 
+  forgotPassword(email: string): Promise<void> {
+    return firstValueFrom(this.http.post<void>('/api/auth/forgot-password', { email }));
+  }
+
+  resetPassword(token: string, newPassword: string): Promise<void> {
+    return firstValueFrom(this.http.post<void>('/api/auth/reset-password', { token, newPassword }));
+  }
+
   changePassword(currentPassword: string, newPassword: string): Promise<void> {
     return firstValueFrom(this.http.post<void>('/api/auth/change-password', { currentPassword, newPassword }));
   }

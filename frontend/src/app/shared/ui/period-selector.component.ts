@@ -1,7 +1,7 @@
 import { Component, computed, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PeriodKey, PeriodQuery } from '../../core/models';
-import { PERIOD_OPTIONS, isoDate } from '../../core/period';
+import { PERIOD_OPTIONS, todayIn } from '../../core/period';
 
 @Component({
   selector: 'app-period-selector',
@@ -15,9 +15,9 @@ import { PERIOD_OPTIONS, isoDate } from '../../core/period';
       </div>
       @if (query().period === 'custom') {
         <div class="custom">
-          <input class="input" type="date" [ngModel]="query().from" (ngModelChange)="setFrom($event)" [max]="today" aria-label="Desde">
+          <input class="input" type="date" [ngModel]="query().from" (ngModelChange)="setFrom($event)" [max]="today()" aria-label="Desde">
           <span class="muted">→</span>
-          <input class="input" type="date" [ngModel]="query().to" (ngModelChange)="setTo($event)" [max]="today" aria-label="Hasta">
+          <input class="input" type="date" [ngModel]="query().to" (ngModelChange)="setTo($event)" [max]="today()" aria-label="Hasta">
         </div>
         @if (invalid()) { <p class="error small">Elige un rango válido (máximo 366 días).</p> }
       }
@@ -38,7 +38,9 @@ export class PeriodSelectorComponent {
   readonly options = PERIOD_OPTIONS;
   readonly query = model.required<PeriodQuery>();
   readonly compact = input(false);
-  readonly today = isoDate(new Date());
+  /** Zona horaria del negocio: "hoy" y el máximo del calendario se calculan en ella, no en la del navegador. */
+  readonly timezone = input<string>('Europe/Madrid');
+  readonly today = computed(() => todayIn(this.timezone()));
 
   readonly invalid = computed(() => {
     const q = this.query();
@@ -49,10 +51,10 @@ export class PeriodSelectorComponent {
 
   select(key: PeriodKey) {
     if (key === 'custom') {
-      const to = new Date();
-      const from = new Date();
-      from.setDate(to.getDate() - 13);
-      this.query.set({ period: 'custom', from: isoDate(from), to: isoDate(to) });
+      const to = this.today();
+      const from = new Date(to + 'T12:00:00Z');
+      from.setUTCDate(from.getUTCDate() - 13);
+      this.query.set({ period: 'custom', from: from.toISOString().slice(0, 10), to });
     } else {
       this.query.set({ period: key });
     }

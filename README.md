@@ -19,7 +19,8 @@ Angular 22 (SPA) ──/api──▶ Spring Boot 4.1 (Java 21) ──▶ Postgre
 
 - `backend/` — API REST (Spring Web, Security, Data JPA, Validation, Flyway, OpenAPI, ZXing).
 - `frontend/` — Angular standalone + signals, formularios reactivos, Chart.js.
-- `landing/` — web pública de venta (HTML/CSS/JS estático, sin build; precios y textos en `landing/app.js`).
+- `landing/` — web pública de venta (HTML/CSS/JS estático, sin build; precios, garantías, contacto y
+  `siteUrl` en `landing/app.js`; sustituye `midominio.com` también en `sitemap.xml` y el `canonical`).
 - `docker-compose.yml` — `postgres` + `backend` + `frontend` (nginx que sirve la SPA y proxifica `/api`) + `landing`.
 - `docs/ARCHITECTURE.md` — entidades, seguridad, redirect, analítica, deduplicación, privacidad.
 - `docs/DEPLOYMENT.md` — despliegue con Nginx Proxy Manager / nginx.
@@ -86,7 +87,7 @@ ya aplicada.
 ## Tests
 
 ```bash
-cd backend && mvn test          # 66 tests: unitarios + integración con PostgreSQL (Testcontainers, requiere Docker)
+cd backend && mvn test          # 70 tests: unitarios + integración con PostgreSQL (Testcontainers, requiere Docker)
 cd frontend && npm test         # Vitest: utilidades de periodo, interceptor de errores, store de sesión
 ```
 
@@ -96,6 +97,14 @@ bots/HEAD ignorados, cabeceras falsificadas, login/lockout por cuenta+IP, revoca
 validación de URL, generación y decodificación de QR.
 
 CI: `.github/workflows/ci.yml` ejecuta ambos bloques y construye las tres imágenes Docker en cada push.
+
+## Email y contraseñas olvidadas
+
+Con `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` y `MAIL_FROM` en `.env`, el enlace "¿Has olvidado tu
+contraseña?" del login envía un correo con un enlace de un solo uso (caduca en 1 h) a
+`APP_BASE_URL/reset-password?token=…`. Sin SMTP el sistema no envía nada (responde igual para no
+revelar cuentas) y deja traza en el log; el administrador puede restablecerla desde *Usuarios*.
+Restablecer la contraseña por cualquier vía cierra todas las sesiones abiertas del usuario.
 
 ## Crear el primer ADMIN
 

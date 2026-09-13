@@ -138,7 +138,8 @@ public class BusinessService {
                 password = Passwords.generate();
                 generated = password;
             }
-            String firstName = req.firstName() == null || req.firstName().isBlank() ? "Propietario" : req.firstName();
+            String firstName = req.firstName() == null || req.firstName().isBlank()
+                    ? defaultNameFromEmail(email) : req.firstName();
             user = userService.createUser(email, password, firstName, req.lastName(), UserRole.BUSINESS_USER);
             created = true;
         } else if (user.getRole() == UserRole.ADMIN) {
@@ -158,6 +159,20 @@ public class BusinessService {
                 .orElseThrow(() -> ApiException.notFound("Miembro"));
         businessUsers.delete(bu);
         log.info("Usuario {} desvinculado del negocio {}", userId, businessId);
+    }
+
+    /** {@code pepe.garcia@x.com} → {@code Pepe Garcia}; mejor que un rol como nombre. */
+    static String defaultNameFromEmail(String email) {
+        String local = email.substring(0, email.indexOf('@')).replaceAll("[._\\-+]+", " ").trim();
+        StringBuilder sb = new StringBuilder();
+        for (String part : local.split(" ")) {
+            if (part.isEmpty()) {
+                continue;
+            }
+            sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1)).append(' ');
+        }
+        String name = sb.toString().trim();
+        return name.isEmpty() ? "Usuario" : name;
     }
 
     private String uniqueSlug(String name) {

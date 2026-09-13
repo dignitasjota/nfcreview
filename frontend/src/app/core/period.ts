@@ -38,3 +38,12 @@ export function isoDate(d: Date): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 }
+
+/** Fecha de "hoy" (YYYY-MM-DD) en una zona horaria IANA; cae a la del navegador si no es válida. */
+export function todayIn(timezone: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  } catch {
+    return isoDate(new Date());
+  }
+}

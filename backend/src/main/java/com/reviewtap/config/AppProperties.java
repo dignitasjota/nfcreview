@@ -9,6 +9,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(
         String publicBaseUrl,
+        String appBaseUrl,
+        Mail mail,
         Cors cors,
         Security security,
         Interactions interactions,
@@ -16,6 +18,8 @@ public record AppProperties(
         Seed seed) {
 
     public record Cors(List<String> allowedOrigins) {}
+
+    public record Mail(String from) {}
 
     public record Security(
             String jwtSecret,
@@ -35,6 +39,12 @@ public record AppProperties(
     public record Bootstrap(String adminEmail, String adminPassword) {}
 
     public record Seed(@DefaultValue("false") boolean enabled, String password) {}
+
+    /** URL del panel sin barra final, p. ej. {@code https://app.midominio.com}. */
+    public String normalizedAppBaseUrl() {
+        String base = appBaseUrl == null ? "" : appBaseUrl.trim();
+        return base.endsWith("/") ? base.substring(0, base.length() - 1) : base;
+    }
 
     /** URL base pública sin barra final, p. ej. {@code https://r.midominio.com}. */
     public String normalizedPublicBaseUrl() {

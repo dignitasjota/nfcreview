@@ -10,7 +10,8 @@ public final class DeviceDtos {
 
     private DeviceDtos() {}
 
-    public record DeviceResponse(UUID id, UUID businessId, String businessName, String publicCode, String name,
+    public record DeviceResponse(UUID id, UUID businessId, String businessName, String businessTimezone,
+            String publicCode, String name,
             String locationDescription, DeviceType type, boolean active, String nfcUrl, String qrUrl,
             long interactionsLast30Days, Instant createdAt) {}
 

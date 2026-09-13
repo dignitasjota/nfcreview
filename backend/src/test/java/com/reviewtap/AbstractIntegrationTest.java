@@ -50,10 +50,12 @@ public abstract class AbstractIntegrationTest {
     @Autowired protected PasswordEncoder passwordEncoder;
     @Autowired protected PublicCodeGenerator codes;
     @Autowired protected InteractionGuard guard;
+    @Autowired protected com.reviewtap.auth.PasswordResetTokenRepository resetTokens;
 
     @BeforeEach
     void cleanDatabase() {
         guard.reset();
+        resetTokens.deleteAll();
         interactions.deleteAll();
         devices.deleteAll();
         businessUsers.deleteAll();

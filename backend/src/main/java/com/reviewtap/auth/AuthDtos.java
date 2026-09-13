@@ -22,6 +22,14 @@ public final class AuthDtos {
             @NotBlank(message = "La nueva contraseña es obligatoria")
             @Pattern(regexp = Passwords.PATTERN, message = Passwords.MESSAGE) String newPassword) {}
 
+    public record ForgotPasswordRequest(
+            @NotBlank(message = "El email es obligatorio") @Email(message = "Email no válido") String email) {}
+
+    public record ResetPasswordRequest(
+            @NotBlank(message = "Falta el token") String token,
+            @NotBlank(message = "La nueva contraseña es obligatoria")
+            @Pattern(regexp = Passwords.PATTERN, message = Passwords.MESSAGE) String newPassword) {}
+
     public record BusinessMembership(UUID id, String name, String slug, String timezone, boolean active,
             BusinessRole role) {}
 

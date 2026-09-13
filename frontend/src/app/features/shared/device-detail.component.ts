@@ -77,7 +77,7 @@ import { PeriodSelectorComponent } from '../../shared/ui/period-selector.compone
             <h2>Estadísticas del dispositivo</h2>
             <button class="btn btn-sm" type="button" (click)="exportCsv()" [disabled]="busy() || !stats()">⤓ CSV</button>
           </div>
-          <app-period-selector [(query)]="query" />
+          <app-period-selector [(query)]="query" [timezone]="device()?.businessTimezone ?? 'Europe/Madrid'" />
           <div class="grid grid-kpi mt-2">
             <app-kpi-card label="Interacciones" [value]="stats()?.total" [loading]="statsLoading()" [accent]="true" />
             <app-kpi-card label="NFC" [value]="stats()?.nfc" [loading]="statsLoading()" />

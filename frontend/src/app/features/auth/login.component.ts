@@ -8,7 +8,7 @@ import { toApiError } from '../../core/interceptors/error.interceptor';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <div class="login">
+    <div class="auth-page">
       <div class="panel">
         <div class="brand"><span class="logo">✓</span> ReviewTap</div>
         <h1>Iniciar sesión</h1>
@@ -32,19 +32,12 @@ import { toApiError } from '../../core/interceptors/error.interceptor';
             {{ loading() ? 'Entrando…' : 'Entrar' }}
           </button>
         </form>
+        <p class="small foot"><a routerLink="/forgot-password">¿Has olvidado tu contraseña?</a></p>
         <p class="small muted foot"><a routerLink="/privacy">Privacidad</a> · <a routerLink="/terms">Términos</a></p>
       </div>
     </div>
   `,
-  styles: `
-    .login { min-height: 100vh; display: grid; place-items: center; padding: 1rem; background: radial-gradient(1200px 600px at 20% -10%, #ccfbf1 0%, transparent 60%), var(--bg); }
-    .panel { width: 100%; max-width: 400px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 2rem; display: grid; gap: 0.75rem; box-shadow: 0 20px 60px rgb(15 23 42 / 0.08); }
-    .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .logo { width: 30px; height: 30px; border-radius: 9px; background: var(--brand); color: #fff; display: grid; place-items: center; }
-    h1 { font-size: 1.35rem; }
-    form { margin-top: 0.5rem; }
-    .foot { text-align: center; margin-top: 0.25rem; }
-  `,
+  styleUrl: './auth.scss',
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);

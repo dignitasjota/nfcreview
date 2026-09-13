@@ -50,6 +50,12 @@
 			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
 		</dependency>
 
+		<!-- Email transaccional (restablecer contraseña). Sólo activo si SMTP_HOST está definido. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- Persistencia -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

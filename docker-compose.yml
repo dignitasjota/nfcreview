@@ -46,6 +46,13 @@ services:
       APP_BOOTSTRAP_ADMIN_PASSWORD: ${APP_BOOTSTRAP_ADMIN_PASSWORD:-}
       SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-false}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+      APP_BASE_URL: ${APP_BASE_URL:?Define APP_BASE_URL en .env}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      MAIL_FROM: ${MAIL_FROM:-}
       DEV_SEED_PASSWORD: ${DEV_SEED_PASSWORD:-}
     ports:
       # Expuesto sólo en localhost: el reverse proxy (NPM/Nginx) enruta r.midominio.com → :8080.
@@ -64,7 +71,7 @@ services:
       BACKEND_URL: http://backend:8080
     ports:
       # El reverse proxy enruta app.midominio.com → :8081.
-      - "${FRONTEND_PORT:-127.0.0.1:8081}:80"
+      - "${FRONTEND_PORT:-127.0.0.1:8081}:8080"
     networks: [internal, proxy]
 
   landing:
@@ -74,7 +81,7 @@ services:
     logging: *logging
     ports:
       # Web pública de venta: el reverse proxy enruta midominio.com / www.midominio.com → :8082.
-      - "${LANDING_PORT:-127.0.0.1:8082}:80"
+      - "${LANDING_PORT:-127.0.0.1:8082}:8080"
     networks: [proxy]
 
   # Backup diario de PostgreSQL (pg_dump + gzip) con retención. Sólo con `--profile backup`.

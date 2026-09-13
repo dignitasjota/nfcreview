@@ -65,7 +65,10 @@ import { TIMEZONES } from '../shared/timezones';
         <div class="alert alert-success stack">
           <strong>Negocio "{{ b.name }}" creado.</strong>
           @if (owner(); as o) {
-            <span>Propietario: <strong>{{ o.email }}</strong> {{ o.created ? '(usuario nuevo)' : '(usuario existente, asignado)' }}</span>
+            <span>Propietario: <strong>{{ o.email }}</strong> {{ o.created ? '(usuario nuevo)' : '(usuario existente, asignado a este negocio)' }}</span>
+            @if (!o.created && passwordGiven()) {
+              <span class="alert alert-warn" style="padding:.5rem .75rem">Ese usuario ya existía: la contraseña que has escrito <strong>no se ha aplicado</strong>; conserva la suya. Si necesita una nueva, restablécela desde <em>Usuarios</em>.</span>
+            }
             @if (o.generatedPassword) {
               <div class="row">
                 <span>Contraseña inicial: <code class="pw">{{ o.generatedPassword }}</code></span>
@@ -147,6 +150,7 @@ export class BusinessWizardComponent {
   protected readonly fieldErrors = signal<Record<string, string>>({});
   protected readonly business = signal<Business | null>(null);
   protected readonly owner = signal<OwnerResult | null>(null);
+  protected readonly passwordGiven = signal(false);
   protected readonly device = signal<Device | null>(null);
   protected readonly timezones = TIMEZONES;
   protected readonly types: DeviceType[] = ['NFC_QR', 'NFC', 'QR'];
@@ -189,6 +193,7 @@ export class BusinessWizardComponent {
       });
       this.business.set(res.business);
       this.owner.set(res.owner);
+      this.passwordGiven.set(!!v.ownerPassword);
       this.step.set(2);
       this.toast.success('Negocio creado');
     } catch (e) {

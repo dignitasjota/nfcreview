@@ -9,6 +9,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/reset-password.component').then((m) => m.ResetPasswordComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/public-layout.component').then((m) => m.PublicLayoutComponent),
     children: [

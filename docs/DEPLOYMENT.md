@@ -4,9 +4,9 @@
 
 | Dominio | Destino | Contenido |
 |---|---|---|
-| `app.midominio.com` | contenedor `frontend` (nginx, puerto 80) | SPA Angular; nginx proxifica `/api/*` al backend en la red interna |
+| `app.midominio.com` | contenedor `frontend` (nginx sin root, puerto 8080) | SPA Angular; nginx proxifica `/api/*` al backend en la red interna |
 | `r.midominio.com` | contenedor `backend` (puerto 8080) | Redirecciones públicas `/d/{code}` |
-| `midominio.com` / `www.` | contenedor `landing` (nginx, puerto 80 → `LANDING_PORT`) | Web pública de venta (estática, `landing/`) |
+| `midominio.com` / `www.` | contenedor `landing` (nginx sin root, puerto 8080 → `LANDING_PORT`) | Web pública de venta (estática, `landing/`) |
 
 No hace falta `api.midominio.com`: el frontend y la API comparten origen a través del proxy de nginx, lo
 que evita CORS y cookies cross-site. Si prefieres separarlos, apunta `api.midominio.com` al backend y define
@@ -46,9 +46,9 @@ Si NPM corre en Docker en el mismo host, conéctalo a la red `reviewtap-proxy` (
 
 | Proxy host | Scheme | Forward host | Puerto | Opciones |
 |---|---|---|---|---|
-| `app.midominio.com` | http | `reviewtap-frontend-1` (o `127.0.0.1` si NPM está fuera de Docker) | 80 (u `8081`) | Websockets no necesarios; *Block common exploits* OK |
+| `app.midominio.com` | http | `reviewtap-frontend-1` (o `127.0.0.1` si NPM está fuera de Docker) | 8080 (u `8081` publicado) | Websockets no necesarios; *Block common exploits* OK |
 | `r.midominio.com` | http | `reviewtap-backend-1` (o `127.0.0.1`) | 8080 | — |
-| `midominio.com`, `www.midominio.com` | http | `reviewtap-landing-1` (o `127.0.0.1`) | 80 (u `8082`) | — |
+| `midominio.com`, `www.midominio.com` | http | `reviewtap-landing-1` (o `127.0.0.1`) | 8080 (u `8082` publicado) | — |
 
 Activa **Force SSL** y **HTTP/2** en ambos y solicita certificados Let's Encrypt.
 
@@ -124,4 +124,6 @@ que redirige a Google y que la interacción aparece en el dashboard.
 ## Variables de entorno
 
 Ver `.env.example`. Las críticas: `POSTGRES_PASSWORD`, `JWT_SECRET` (≥32 bytes), `PUBLIC_BASE_URL`
-(sin barra final; no cambiarla una vez impresas tarjetas), `COOKIE_SECURE=true`, `APP_BOOTSTRAP_ADMIN_*`.
+(sin barra final; no cambiarla una vez impresas tarjetas), `APP_BASE_URL` (enlaces de los emails),
+`COOKIE_SECURE=true`, `APP_BOOTSTRAP_ADMIN_*`. Opcionales: `SMTP_*` y `MAIL_FROM` para el correo de
+restablecimiento de contraseña, `TRUSTED_PROXIES`, `BACKUP_KEEP_DAYS`.

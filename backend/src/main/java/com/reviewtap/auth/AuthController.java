@@ -1,6 +1,8 @@
 package com.reviewtap.auth;
 
 import com.reviewtap.auth.AuthDtos.ChangePasswordRequest;
+import com.reviewtap.auth.AuthDtos.ForgotPasswordRequest;
+import com.reviewtap.auth.AuthDtos.ResetPasswordRequest;
 import com.reviewtap.auth.AuthDtos.LoginRequest;
 import com.reviewtap.auth.AuthDtos.MeResponse;
 import com.reviewtap.interaction.ClientKeyResolver;
@@ -26,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final SessionCookies cookies;
+    private final PasswordResetService passwordReset;
 
     @PostMapping("/login")
     public ResponseEntity<MeResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
@@ -47,6 +50,20 @@ public class AuthController {
     @GetMapping("/me")
     public MeResponse me() {
         return authService.me(CurrentUser.require().userId());
+    }
+
+    /** Responde 204 exista o no el email (evita enumerar cuentas). */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request,
+            HttpServletRequest http) {
+        passwordReset.request(request.email(), ClientKeyResolver.clientIp(http));
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordReset.reset(request.token(), request.newPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/change-password")

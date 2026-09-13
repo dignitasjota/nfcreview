@@ -33,7 +33,7 @@ type SortKey = 'name' | 'nfc' | 'qr' | 'total';
           <button class="btn" type="button" (click)="exportCsv()" [disabled]="exporting()">{{ exporting() ? 'Exportando…' : '⤓ Exportar CSV' }}</button>
         </div>
 
-        <app-period-selector [(query)]="query" />
+        <app-period-selector [(query)]="query" [timezone]="biz.timezone" />
 
         @if (error()) { <app-error-state [error]="error()" (retry)="load()" /> }
 

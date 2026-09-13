@@ -117,7 +117,8 @@ public class DeviceService {
     }
 
     private DeviceResponse toResponse(Device d, long last30) {
-        return new DeviceResponse(d.getId(), d.getBusiness().getId(), d.getBusiness().getName(), d.getPublicCode(),
+        return new DeviceResponse(d.getId(), d.getBusiness().getId(), d.getBusiness().getName(),
+                d.getBusiness().getTimezone(), d.getPublicCode(),
                 d.getName(), d.getLocationDescription(), d.getType(), d.isActive(), urls.nfc(d.getPublicCode()),
                 urls.qr(d.getPublicCode()), last30, d.getCreatedAt());
     }

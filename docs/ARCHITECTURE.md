@@ -118,6 +118,10 @@ El bloqueo de login (`LoginAttemptService`) usa el mismo enfoque con dos claves:
   - CSRF: la cookie es `SameSite=Strict`, la API sólo acepta JSON y el cliente añade
     `X-Requested-With`; los formularios cross-site no pueden reproducir eso. Por eso se desactiva el
     token CSRF de Spring.
+- **Contraseña olvidada** (`PasswordResetService`): token de 32 bytes aleatorios en el enlace; en BD
+  sólo su SHA-256 (`password_reset_token`), 1 h de vida, un solo uso, purga diaria. La solicitud
+  responde siempre 204 y está limitada a 3/h por email y 15/h por IP. Sin SMTP configurado no se envía
+  nada y se deja traza en el log. El envío de correo (`MailService`) nunca lanza excepciones.
 - **Filtro** `JwtCookieAuthFilter`: valida la firma y **recarga el usuario de BD** en cada petición
   autenticada, de modo que deshabilitar un usuario o cambiarle el rol surte efecto inmediato.
 - **Autorización de rutas** (`SecurityConfig`): `/d/**`, `/actuator/health`, `/api/docs/**` y

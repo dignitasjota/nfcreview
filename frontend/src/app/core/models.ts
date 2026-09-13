@@ -113,6 +113,7 @@ export interface Device {
   id: string;
   businessId: string;
   businessName: string;
+  businessTimezone: string;
   publicCode: string;
   name: string;
   locationDescription: string | null;

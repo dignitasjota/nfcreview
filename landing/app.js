@@ -4,6 +4,7 @@
    ===================================================================== */
 const SITE = {
   brand: 'ReviewTap',
+  siteUrl: 'https://midominio.com',                  // URL pública de esta web (canonical, sitemap, JSON-LD)
   appUrl: 'https://app.midominio.com/login',        // panel de clientes
   privacyUrl: 'https://app.midominio.com/privacy',
   termsUrl: 'https://app.midominio.com/terms',
@@ -17,8 +18,10 @@ const SITE = {
   guaranteeShort: 'Garantía de 30 días',
   guaranteeTitle: 'Garantía de 30 días',
   guaranteeText: 'Si no consigues más reseñas que antes, te devolvemos el 100 % del importe.',
+  technicalWarranty: 'Además, todos los dispositivos tienen garantía técnica de 2 años y el enlace no caduca nunca.',
+  returnsText: 'Dispones de 30 días naturales desde la recepción para devolver el producto en su estado original; los gastos de envío de la devolución corren a cargo del comprador salvo defecto de fabricación.',
   legalLine: 'ReviewTap es una marca de [Tu empresa, S.L.] · [Dirección fiscal]',
-  legalNotice: 'Titular: [Tu empresa, S.L.] · CIF [B00000000] · [Dirección] · [email]. Devoluciones: dispones de 30 días naturales desde la recepción para devolver el producto en su estado original; los gastos de envío de la devolución corren a cargo del comprador salvo defecto de fabricación.',
+  legalNotice: 'Titular: [Tu empresa, S.L.] · CIF [B00000000] · [Dirección] · [email].',
   // Cifras reales o null para ocultar la línea. Ejemplo: { rating: 4.9, reviews: 120, businesses: 350 }
   stats: null,
   // Testimonios REALES (con permiso). Si la lista está vacía, la sección no se muestra.
@@ -44,6 +47,30 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const fmt = (n) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: SITE.currency }).format(n);
 const product = (id) => SITE.products.find((p) => p.id === id);
+
+/* ---- SEO: canonical + datos estructurados (Organization, Product por artículo, FAQPage) ---- */
+(function seo() {
+  const canonical = $('link[rel=canonical]');
+  if (canonical && SITE.siteUrl) canonical.href = SITE.siteUrl.replace(/\/$/, '') + '/';
+  const base = SITE.siteUrl.replace(/\/$/, '');
+  const faqs = $$('.faq-list details').map((d) => ({
+    '@type': 'Question', name: $('summary', d).textContent.trim(),
+    acceptedAnswer: { '@type': 'Answer', text: $('p', d).textContent.trim() },
+  }));
+  const graph = [
+    { '@type': 'Organization', name: SITE.brand, url: base + '/', logo: base + '/img/logo.svg', email: SITE.email },
+    { '@type': 'WebSite', name: SITE.brand, url: base + '/' },
+    ...SITE.products.map((p) => ({
+      '@type': 'Product', name: p.name, description: p.desc, image: base + '/' + p.img, brand: { '@type': 'Brand', name: SITE.brand },
+      offers: { '@type': 'Offer', price: p.price.toFixed(2), priceCurrency: SITE.currency, availability: 'https://schema.org/InStock', url: base + '/#tienda' },
+    })),
+    { '@type': 'FAQPage', mainEntity: faqs },
+  ];
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+  document.head.appendChild(script);
+})();
 
 /* ---- Textos y enlaces configurables ---- */
 $$('[data-site]').forEach((el) => { const v = SITE[el.dataset.site]; if (v) el.textContent = v; });
