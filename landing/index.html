@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReviewTap — Consigue más reseñas en Google con dispositivos NFC y QR</title>
+  <meta name="description" content="Expositores, placas y tarjetas NFC + QR que llevan a tus clientes a dejar una reseña en Google en 5 segundos. Pago único, sin suscripciones, estadísticas incluidas.">
+  <meta property="og:title" content="ReviewTap — Más reseñas en Google para tu negocio">
+  <meta property="og:description" content="Dispositivos NFC + QR listos para usar. Pago único, sin suscripciones, panel de estadísticas incluido.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="promo-bar" aria-label="Ventajas">
+  <ul>
+    <li>🚚 <span data-site="shippingShort">Envío gratis 24–48 h</span></li>
+    <li>🛡️ <span data-site="guaranteeShort">Garantía de 30 días</span></li>
+    <li>🔓 Sin suscripciones</li>
+  </ul>
+</div>
+
+<header class="site-header">
+  <div class="container nav-row">
+    <a class="brand" href="#inicio"><img src="img/logo.svg" alt="" width="30" height="30"><span data-site="brand">ReviewTap</span></a>
+    <nav class="nav" id="nav">
+      <a href="#inicio">Inicio</a>
+      <a href="#tienda">Tienda</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#plataforma">Plataforma</a>
+      <a href="#contacto">Contacto</a>
+      <a class="nav-login" data-site-href="appUrl" href="#">Acceso clientes</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="cart-btn" id="cart-btn" type="button" aria-label="Abrir carrito">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+        <span class="cart-count" id="cart-count" hidden>0</span>
+      </button>
+      <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="container hero-grid">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Dispositivos NFC + QR para reseñas de Google</p>
+        <h1>Multiplica las reseñas en Google de tu negocio</h1>
+        <p class="lead">Tus clientes acercan el móvil o escanean el QR y aterrizan directamente en la pantalla para escribir su reseña. Sin apps, sin buscar tu negocio, sin explicaciones.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="#producto">Comprar expositor</a>
+          <a class="btn btn-ghost btn-lg" href="#como-funciona">Ver cómo funciona</a>
+        </div>
+        <ul class="hero-proof">
+          <li><strong>Pago único</strong><span>sin cuotas mensuales</span></li>
+          <li><strong>Listo en 5 s</strong><span>para tu cliente</span></li>
+          <li><strong>Panel incluido</strong><span>estadísticas de por vida</span></li>
+        </ul>
+        <p class="rating-line" id="hero-stats" hidden></p>
+      </div>
+      <div class="hero-visual reveal delay-1">
+        <div class="hero-stage">
+          <img src="img/device-stand.svg" alt="Expositor ReviewTap con NFC y QR" width="420" height="420" class="hero-device">
+          <div class="float-badge badge-nfc"><span class="wave"></span> Acerca el móvil</div>
+          <div class="float-badge badge-star">★★★★★ <span>Reseña en Google</span></div>
+          <div class="float-badge badge-qr">▦ o escanea el QR</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTO DESTACADO -->
+  <section class="product" id="producto">
+    <div class="container product-grid">
+      <div class="gallery reveal">
+        <div class="gallery-main"><img id="gallery-main" src="img/device-stand.svg" alt="Expositor de reseñas ReviewTap" width="420" height="420"></div>
+        <div class="gallery-thumbs" id="gallery-thumbs">
+          <button type="button" class="on" data-src="img/device-stand.svg" aria-label="Expositor"><img src="img/device-stand.svg" alt=""></button>
+          <button type="button" data-src="img/device-plate.svg" aria-label="Placa"><img src="img/device-plate.svg" alt=""></button>
+          <button type="button" data-src="img/device-card.svg" aria-label="Tarjeta"><img src="img/device-card.svg" alt=""></button>
+          <button type="button" data-src="img/device-pack.svg" aria-label="Pack"><img src="img/device-pack.svg" alt=""></button>
+        </div>
+      </div>
+      <div class="product-info reveal delay-1">
+        <h2 id="featured-name">Expositor Reseñas Google</h2>
+        <p class="product-rating" id="featured-rating" hidden></p>
+        <p class="product-desc">Conectado a la ficha de Google de tu negocio. Tus clientes acercan el móvil o escanean el QR y pueden dejarte su reseña de 5 estrellas al instante.</p>
+        <ul class="checks">
+          <li>Pago único — sin suscripciones</li>
+          <li>Reseñas en 5 segundos, desde cualquier móvil</li>
+          <li>Llega ya configurado con tu negocio</li>
+          <li>Panel de estadísticas incluido de por vida</li>
+        </ul>
+        <div class="buy-row">
+          <div class="price-block"><span class="price" id="featured-price">39,90 €</span><span class="price-note">IVA incl.</span></div>
+          <div class="qty" aria-label="Cantidad">
+            <button type="button" id="qty-minus" aria-label="Menos">−</button>
+            <input id="qty" type="number" min="1" max="99" value="1" inputmode="numeric" aria-label="Cantidad">
+            <button type="button" id="qty-plus" aria-label="Más">+</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" id="add-featured" type="button">Añadir al carrito</button>
+        <p class="shipping-note" data-site="shippingText">El envío es gratuito y el plazo de entrega es de 24 a 48 horas laborables en España peninsular.</p>
+        <div class="guarantee">
+          <strong data-site="guaranteeTitle">Garantía de 30 días</strong>
+          <span data-site="guaranteeText">Si no consigues más reseñas que antes, te devolvemos el 100 % del importe.</span>
+        </div>
+        <p class="pay-note">Pago seguro · Factura con IVA · Atención por WhatsApp y email</p>
+        <details class="specs">
+          <summary>Detalles técnicos</summary>
+          <ul>
+            <li><strong>NFC de alto rendimiento</strong> — compatible con iPhone y Android sin ninguna app.</li>
+            <li><strong>QR optimizado</strong> — alto contraste, se lee a distancia y con poca luz.</li>
+            <li><strong>Medidas del expositor</strong> — 14,6 × 11,4 × 5,5 cm, base antideslizante.</li>
+            <li><strong>Acabado</strong> — lámina protectora antiarañazos, apto para limpieza con desinfectante.</li>
+            <li><strong>Reconfigurable</strong> — si cambias de ficha de Google, lo actualizamos sin que compres otro.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 PASOS -->
+  <section class="steps" id="pasos">
+    <div class="container">
+      <h2 class="section-title reveal">Listo para usar en 3 pasos</h2>
+      <p class="section-sub reveal">No necesitas configurar nada: te lo enviamos conectado a tu negocio.</p>
+      <ol class="steps-grid">
+        <li class="step reveal"><span class="step-num">1</span><h3>Haz tu pedido y dinos tu negocio</h3><p>Nos indicas el nombre y la dirección de tu negocio (o el enlace de tu ficha de Google) al finalizar el pedido.</p></li>
+        <li class="step reveal delay-1"><span class="step-num">2</span><h3>Lo conectamos antes de enviarlo</h3><p>Vinculamos cada dispositivo a la página de reseñas de tu ficha de Google y lo probamos. Recibes tu acceso al panel de estadísticas.</p></li>
+        <li class="step reveal delay-2"><span class="step-num">3</span><h3>Colócalo y empieza a recibir reseñas</h3><p>Ponlo en el mostrador, la entrada o la mesa. Cada cliente que acerque el móvil llega directo a dejar su reseña.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="how" id="como-funciona">
+    <div class="container how-grid">
+      <article class="how-card reveal">
+        <div class="how-icon"><span class="wave big"></span></div>
+        <h3>¿Cómo funciona?</h3>
+        <p>Gracias a su chip NFC, cuando tu cliente acerca el móvil se abre automáticamente la página de reseñas de tu negocio en Google. Deja su opinión en 5 segundos, sin escribir tu nombre ni buscarte.</p>
+      </article>
+      <article class="how-card reveal delay-1">
+        <div class="how-icon">📱</div>
+        <h3>¿Qué es el NFC?</h3>
+        <p>Es la misma tecnología sin contacto de los datáfonos. Todos los iPhone y Android modernos la llevan activada de serie: no hay que instalar ninguna app. Y si el móvil es antiguo, siempre queda el QR.</p>
+      </article>
+      <article class="how-card reveal delay-2">
+        <div class="how-icon">⭐</div>
+        <h3>¿Cómo empiezo a conseguir reseñas?</h3>
+        <p><strong>Paso 1:</strong> coloca los dispositivos donde tus clientes terminan su visita.<br><strong>Paso 2:</strong> pídeles su opinión con una frase: «¿Nos dejas una reseña? Sólo tienes que acercar el móvil».</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- PLATAFORMA -->
+  <section class="platform" id="plataforma">
+    <div class="container platform-grid">
+      <div class="platform-copy reveal">
+        <p class="eyebrow">Panel incluido · sin cuotas</p>
+        <h2>Mide qué dispositivos funcionan mejor</h2>
+        <p class="lead">Cada dispositivo tiene su panel de estadísticas: interacciones por día, NFC frente a QR, comparación con el periodo anterior y ranking de dispositivos (mostrador, entrada, tarjetas de empleados…).</p>
+        <ul class="checks">
+          <li>Acceso web desde móvil u ordenador</li>
+          <li>Exportación a CSV</li>
+          <li>Sin datos personales de tus clientes: sólo cifras agregadas</li>
+        </ul>
+        <a class="btn btn-ghost" data-site-href="appUrl" href="#">Acceder al panel →</a>
+      </div>
+      <div class="platform-mock reveal delay-1" aria-hidden="true">
+        <div class="mock-top"><span></span><span></span><span></span></div>
+        <div class="mock-head"><strong>Hola, Barbería Pepe</strong><em>Últimos 30 días</em></div>
+        <div class="mock-kpis"><div><small>Interacciones</small><b>193</b><i>+18 %</i></div><div><small>NFC</small><b>128</b></div><div><small>QR</small><b>65</b></div></div>
+        <div class="mock-chart"><i style="--h:40%"></i><i style="--h:55%"></i><i style="--h:35%"></i><i style="--h:70%"></i><i style="--h:60%"></i><i style="--h:85%"></i><i style="--h:50%"></i><i style="--h:65%"></i><i style="--h:90%"></i><i style="--h:75%"></i><i style="--h:55%"></i><i style="--h:80%"></i></div>
+        <div class="mock-table"><div><span>Mostrador</span><span>105</span></div><div><span>Entrada</span><span>60</span></div><div><span>Tarjeta 1</span><span>28</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POR QUÉ RESEÑAS -->
+  <section class="why">
+    <div class="container why-grid">
+      <div class="why-stat reveal"><span class="big-num">5★</span><span>es lo primero que mira un cliente nuevo antes de entrar</span></div>
+      <div class="why-copy reveal delay-1">
+        <h2>¿Por qué necesito más reseñas?</h2>
+        <p>La mayoría de las personas consultan las reseñas antes de decidir a qué negocio ir. Cuantas más reseñas recientes y mejor valoradas tengas, más arriba apareces en Google Maps y en las búsquedas locales, y más clientes entran por la puerta.</p>
+        <p>El problema nunca ha sido que tus clientes no estén contentos: es que dejar una reseña cuesta demasiados pasos. ReviewTap elimina todos menos uno.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIENDA -->
+  <section class="shop" id="tienda">
+    <div class="container">
+      <h2 class="section-title reveal">Elige tu formato</h2>
+      <p class="section-sub reveal">Todos incluyen NFC + QR, configuración previa y panel de estadísticas.</p>
+      <div class="shop-grid" id="shop-grid"></div>
+      <p class="shop-note reveal">¿Necesitas más unidades, un diseño personalizado con tu logo o varios locales? <a href="#contacto">Escríbenos</a> y preparamos un presupuesto.</p>
+    </div>
+  </section>
+
+  <!-- IDEAL PARA -->
+  <section class="fit">
+    <div class="container">
+      <h2 class="section-title reveal">Así se usa en cada negocio</h2>
+      <div class="fit-grid">
+        <div class="fit-card reveal"><span>💈</span><strong>Barberías y peluquerías</strong><p>Expositor en recepción y tarjeta por profesional.</p></div>
+        <div class="fit-card reveal delay-1"><span>🍽️</span><strong>Restaurantes y cafeterías</strong><p>Placa junto a la caja o tarjeta con la cuenta.</p></div>
+        <div class="fit-card reveal delay-2"><span>🦷</span><strong>Clínicas y consultas</strong><p>Expositor en el mostrador al salir de la cita.</p></div>
+        <div class="fit-card reveal"><span>🏨</span><strong>Hoteles y alojamientos</strong><p>Placa en recepción y tarjeta en la habitación.</p></div>
+        <div class="fit-card reveal delay-1"><span>🚗</span><strong>Talleres y concesionarios</strong><p>Tarjeta al entregar las llaves.</p></div>
+        <div class="fit-card reveal delay-2"><span>🛍️</span><strong>Comercios y tiendas</strong><p>Expositor junto al datáfono.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container faq-inner">
+      <h2 class="section-title reveal">Preguntas frecuentes</h2>
+      <div class="faq-list reveal">
+        <details><summary>¿Tiene alguna suscripción o cuota mensual?</summary><p>No. Pagas una vez por cada dispositivo y el panel de estadísticas queda incluido de por vida. No hay pagos extra ni permanencias.</p></details>
+        <details><summary>¿Qué recibo exactamente?</summary><p>El dispositivo físico ya conectado a la página de reseñas de tu ficha de Google, una tarjeta con instrucciones y tu acceso al panel web con las estadísticas de todos tus dispositivos.</p></details>
+        <details><summary>¿Tengo que configurar algo?</summary><p>Nada. Lo configuramos y probamos antes de enviártelo. Sólo tienes que colocarlo. Si más adelante cambias de ficha de Google o de local, lo actualizamos desde nuestro lado sin que compres otro.</p></details>
+        <details><summary>No entiendo cómo funciona el NFC. ¿Es fácil para mis clientes?</summary><p>Sí. El cliente acerca la parte superior de su móvil al dispositivo, igual que al pagar con el teléfono, y le aparece la página para escribir la reseña. Si prefiere, escanea el QR con la cámara. No hace falta instalar nada.</p></details>
+        <details><summary>¿Realmente lo usarán mis clientes?</summary><p>Cuando dejar una reseña cuesta un gesto de dos segundos, muchos más clientes la dejan. Funciona mejor si tu equipo lo pide con naturalidad: «¿Nos dejas una reseña? Sólo acerca el móvil».</p></details>
+        <details><summary>¿Qué muestran las estadísticas?</summary><p>Interacciones (aperturas del enlace) por día, por dispositivo y por canal (NFC o QR), comparadas con el periodo anterior. No incluyen el contenido de las reseñas ni datos personales de tus clientes: una interacción indica que alguien abrió la página, no que publicara la reseña.</p></details>
+        <details><summary>¿Es compatible con las normas de Google?</summary><p>Sí. El dispositivo sólo abre la página oficial de Google para escribir una reseña: no filtra opiniones, no ofrece incentivos ni publica nada en nombre del cliente. Recomendamos pedir la reseña a todos los clientes por igual.</p></details>
+        <details><summary>¿Tiene garantía?</summary><p><span data-site="guaranteeText">Si no consigues más reseñas que antes, te devolvemos el 100 % del importe.</span> Además, todos los dispositivos tienen garantía técnica de 2 años y el enlace no caduca nunca.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS (sólo si hay reales en SITE.testimonials) -->
+  <section class="testimonials" id="testimonios" hidden>
+    <div class="container">
+      <h2 class="section-title reveal">Lo que dicen nuestros clientes</h2>
+      <div class="testi-grid" id="testi-grid"></div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contact" id="contacto">
+    <div class="container contact-grid">
+      <div class="reveal">
+        <h2>Atención al cliente humana</h2>
+        <p class="lead">¿Dudas antes de comprar, un pedido grande o un diseño con tu logo? Te respondemos personalmente, sin bots.</p>
+        <div class="contact-ways">
+          <a class="btn btn-primary" id="wa-link" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+          <a class="btn btn-ghost" id="mail-link" href="#">Enviar email</a>
+        </div>
+      </div>
+      <form class="contact-form reveal delay-1" id="contact-form">
+        <label>Nombre<input name="name" required autocomplete="name"></label>
+        <label>Negocio<input name="business" autocomplete="organization"></label>
+        <label>Email o teléfono<input name="reply" required></label>
+        <label>Mensaje<textarea name="message" rows="4" required></textarea></label>
+        <button class="btn btn-primary btn-block" type="submit">Enviar mensaje</button>
+        <p class="form-hint">Se abrirá tu aplicación de correo con el mensaje preparado.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="brand" href="#inicio"><img src="img/logo.svg" alt="" width="26" height="26"><span data-site="brand">ReviewTap</span></a>
+      <p class="footer-legal" data-site="legalLine">ReviewTap es una marca de [Tu empresa, S.L.] · [Dirección fiscal]</p>
+      <p><a data-site-mailto="email" href="#" data-site="email">hola@midominio.com</a></p>
+    </div>
+    <div>
+      <h4>Accesos</h4>
+      <a href="#inicio">Inicio</a><a href="#tienda">Tienda</a><a href="#como-funciona">Cómo funciona</a><a href="#plataforma">Plataforma</a><a href="#contacto">Contacto</a><a data-site-href="appUrl" href="#">Acceso clientes</a>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <a href="#aviso-legal" id="legal-toggle">Aviso legal</a><a data-site-href="privacyUrl" href="#">Política de privacidad</a><a data-site-href="termsUrl" href="#">Términos y condiciones</a><a href="#aviso-legal">Devoluciones</a>
+    </div>
+    <div>
+      <h4>Síguenos</h4>
+      <a data-site-href="instagram" href="#" target="_blank" rel="noopener">Instagram</a><a data-site-href="facebook" href="#" target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </div>
+  <div class="container legal-box" id="aviso-legal">
+    <h4>Aviso legal y devoluciones</h4>
+    <p data-site="legalNotice">Titular: [Tu empresa, S.L.] · CIF [B00000000] · [Dirección] · [email]. Devoluciones: dispones de 30 días naturales desde la recepción para devolver el producto en su estado original; los gastos de envío de la devolución corren a cargo del comprador salvo defecto de fabricación.</p>
+  </div>
+  <div class="container copyright">© <span id="year"></span> <span data-site="brand">ReviewTap</span>. Esta web no utiliza cookies de seguimiento.</div>
+</footer>
+
+<!-- CARRITO -->
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+<aside class="drawer" id="drawer" aria-label="Carrito" aria-hidden="true">
+  <div class="drawer-head"><h3>Tu pedido</h3><button type="button" class="icon-btn" id="drawer-close" aria-label="Cerrar">✕</button></div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot" id="drawer-foot"></div>
+</aside>
+
+<!-- CHECKOUT -->
+<div class="modal-backdrop" id="checkout" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+    <div class="drawer-head"><h3 id="checkout-title">Finalizar pedido</h3><button type="button" class="icon-btn" id="checkout-close" aria-label="Cerrar">✕</button></div>
+    <form id="checkout-form" class="checkout-form">
+      <p class="form-hint">Te confirmamos disponibilidad y el envío en menos de 24 h laborables. El pago se realiza tras la confirmación (transferencia o enlace de pago seguro).</p>
+      <div class="two"><label>Nombre y apellidos<input name="name" required autocomplete="name"></label><label>Teléfono<input name="phone" required autocomplete="tel"></label></div>
+      <label>Email<input name="email" type="email" required autocomplete="email"></label>
+      <label>Nombre del negocio (tal y como aparece en Google Maps)<input name="business" required autocomplete="organization"></label>
+      <label>Dirección del negocio o enlace a tu ficha de Google<input name="google" required></label>
+      <label>Dirección de envío<textarea name="address" rows="2" required autocomplete="street-address"></textarea></label>
+      <label>Notas (logo, colores, varios locales…)<textarea name="notes" rows="2"></textarea></label>
+      <div id="checkout-summary" class="checkout-summary"></div>
+      <div class="checkout-actions">
+        <button class="btn btn-primary btn-lg" type="submit" data-via="whatsapp">Enviar pedido por WhatsApp</button>
+        <button class="btn btn-ghost" type="submit" data-via="email">Enviar por email</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>

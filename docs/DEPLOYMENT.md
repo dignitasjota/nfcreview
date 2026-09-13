@@ -6,6 +6,7 @@
 |---|---|---|
 | `app.midominio.com` | contenedor `frontend` (nginx, puerto 80) | SPA Angular; nginx proxifica `/api/*` al backend en la red interna |
 | `r.midominio.com` | contenedor `backend` (puerto 8080) | Redirecciones públicas `/d/{code}` |
+| `midominio.com` / `www.` | contenedor `landing` (nginx, puerto 80 → `LANDING_PORT`) | Web pública de venta (estática, `landing/`) |
 
 No hace falta `api.midominio.com`: el frontend y la API comparten origen a través del proxy de nginx, lo
 que evita CORS y cookies cross-site. Si prefieres separarlos, apunta `api.midominio.com` al backend y define
@@ -47,6 +48,7 @@ Si NPM corre en Docker en el mismo host, conéctalo a la red `reviewtap-proxy` (
 |---|---|---|---|---|
 | `app.midominio.com` | http | `reviewtap-frontend-1` (o `127.0.0.1` si NPM está fuera de Docker) | 80 (u `8081`) | Websockets no necesarios; *Block common exploits* OK |
 | `r.midominio.com` | http | `reviewtap-backend-1` (o `127.0.0.1`) | 8080 | — |
+| `midominio.com`, `www.midominio.com` | http | `reviewtap-landing-1` (o `127.0.0.1`) | 80 (u `8082`) | — |
 
 Activa **Force SSL** y **HTTP/2** en ambos y solicita certificados Let's Encrypt.
 

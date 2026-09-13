@@ -19,7 +19,8 @@ Angular 22 (SPA) ──/api──▶ Spring Boot 4.1 (Java 21) ──▶ Postgre
 
 - `backend/` — API REST (Spring Web, Security, Data JPA, Validation, Flyway, OpenAPI, ZXing).
 - `frontend/` — Angular standalone + signals, formularios reactivos, Chart.js.
-- `docker-compose.yml` — `postgres` + `backend` + `frontend` (nginx que sirve la SPA y proxifica `/api`).
+- `landing/` — web pública de venta (HTML/CSS/JS estático, sin build; precios y textos en `landing/app.js`).
+- `docker-compose.yml` — `postgres` + `backend` + `frontend` (nginx que sirve la SPA y proxifica `/api`) + `landing`.
 - `docs/ARCHITECTURE.md` — entidades, seguridad, redirect, analítica, deduplicación, privacidad.
 - `docs/DEPLOYMENT.md` — despliegue con Nginx Proxy Manager / nginx.
 
@@ -40,6 +41,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
+- Web pública: http://localhost:8082 (`LANDING_PORT`).
 - Panel: http://localhost:8081 (o el `FRONTEND_PORT` configurado).
 - API/redirect: http://localhost:8080 — `GET /actuator/health`, `GET /d/{code}`.
 - Swagger UI (si `SWAGGER_UI_ENABLED=true`): http://localhost:8080/api/docs/ui

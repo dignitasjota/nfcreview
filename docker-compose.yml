@@ -55,6 +55,15 @@ services:
       - "${FRONTEND_PORT:-127.0.0.1:8081}:80"
     networks: [internal, proxy]
 
+  landing:
+    build: ./landing
+    image: reviewtap-landing:latest
+    restart: unless-stopped
+    ports:
+      # Web pública de venta: el reverse proxy enruta midominio.com / www.midominio.com → :8082.
+      - "${LANDING_PORT:-127.0.0.1:8082}:80"
+    networks: [proxy]
+
 volumes:
   pgdata:
 
