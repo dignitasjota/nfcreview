@@ -3,7 +3,9 @@ FROM node:22-alpine AS build
 WORKDIR /build
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund --legacy-peer-deps
-COPY . .
+COPY angular.json tsconfig.json tsconfig.app.json ./
+COPY public ./public
+COPY src ./src
 RUN npx ng build --configuration production
 
 # ---- runtime ----

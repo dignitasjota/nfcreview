@@ -50,7 +50,10 @@ Si NPM corre en Docker en el mismo host, conéctalo a la red `reviewtap-proxy` (
 
 Activa **Force SSL** y **HTTP/2** en ambos y solicita certificados Let's Encrypt.
 
-NPM envía `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP` por defecto. El backend tiene
+NPM envía `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP` por defecto. **Importante**: el proxy debe
+reenviar la cabecera `Host` original (NPM lo hace; en nginx, `proxy_set_header Host $http_host`). Spring
+compara `Origin` con `Host`/`X-Forwarded-*` para distinguir peticiones same-origin de cross-origin: si el
+host llega alterado, el login devuelve 403 desde el navegador aunque funcione con `curl`. El backend tiene
 `server.forward-headers-strategy=framework`, con lo que Spring reconoce HTTPS (cookie `Secure`) y el host
 público; `ClientKeyResolver` usa `X-Forwarded-For` para la deduplicación anónima.
 
