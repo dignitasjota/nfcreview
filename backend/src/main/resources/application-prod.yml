@@ -1,0 +1,12 @@
+# Producción: sin seed, Swagger desactivado salvo SWAGGER_UI_ENABLED=true, logs en INFO.
+app:
+  seed:
+    enabled: false
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}
+  api-docs:
+    enabled: ${SWAGGER_UI_ENABLED:false}
+logging:
+  level:
+    com.reviewtap: INFO

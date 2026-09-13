@@ -1,0 +1,65 @@
+# ReviewTap — stack completo. Copia .env.example a .env y ajusta valores antes de `docker compose up -d`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-reviewtap}
+      POSTGRES_USER: ${POSTGRES_USER:-reviewtap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-reviewtap} -d ${POSTGRES_DB:-reviewtap}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  backend:
+    build: ./backend
+    image: reviewtap-backend:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-reviewtap}
+      DATABASE_USER: ${POSTGRES_USER:-reviewtap}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env (openssl rand -base64 48)}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?Define PUBLIC_BASE_URL en .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
+      APP_BOOTSTRAP_ADMIN_PASSWORD: ${APP_BOOTSTRAP_ADMIN_PASSWORD:-}
+      SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-false}
+      DEV_SEED_PASSWORD: ${DEV_SEED_PASSWORD:-}
+    ports:
+      # Expuesto sólo en localhost: el reverse proxy (NPM/Nginx) enruta r.midominio.com → :8080.
+      - "${BACKEND_PORT:-127.0.0.1:8080}:8080"
+    networks: [internal, proxy]
+
+  frontend:
+    build: ./frontend
+    image: reviewtap-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_URL: http://backend:8080
+    ports:
+      # El reverse proxy enruta app.midominio.com → :8081.
+      - "${FRONTEND_PORT:-127.0.0.1:8081}:80"
+    networks: [internal, proxy]
+
+volumes:
+  pgdata:
+
+networks:
+  internal:
+  # Red compartida con Nginx Proxy Manager si corre en el mismo host (docker network create proxy).
+  proxy:
+    name: ${PROXY_NETWORK:-reviewtap-proxy}
